@@ -1,3 +1,4 @@
+import * as methods from './methods.js';
 
 type Task = {
   id: number
@@ -6,13 +7,22 @@ type Task = {
   createdAt: Date
 }
 
-//kada definiramo određeni tip elementa, to omogućava da dobijemo sve propertye, metode iz tih elemenata
+//todo elements
 const list = document.querySelector<HTMLUListElement>("#list")
 const form = document.getElementById("new-task-form") as HTMLFormElement | null
 const input = document.querySelector<HTMLInputElement>("#new-task-title")
 
-const todoTasks: Task[] = loadTasks()
+//done elements
+const listDone = document.querySelector<HTMLUListElement>("#done-list")
+
+
+
+let todoTasks: Task[] = methods.loadTasks('TODO-TASKS')
 todoTasks.forEach(addListItem)
+
+let doneTasks: Task[] = methods.loadTasks('DONE-TASKS')
+doneTasks.forEach(addListItem)
+
 
 form?.addEventListener("submit", e => {
   e.preventDefault()
@@ -26,39 +36,85 @@ form?.addEventListener("submit", e => {
     createdAt: new Date(),
   }
   todoTasks.push(newTask)
-  saveTasks()
+  methods.saveTasks(todoTasks, 'TODO-TASKS')
 
   addListItem(newTask)
   input.value = ""
 })
 
+
+
 function addListItem(task: Task) {
+
   const item = document.createElement("li")
   const label = document.createElement("label")
   const checkbox = document.createElement("input")
+  const deleteOneButton =  document.createElement("button");
+
+  const doneList = document.getElementById("done-list") as HTMLDivElement
   checkbox.addEventListener("change", () => {
     task.completed = checkbox.checked
-    saveTasks()
+    if (task.completed == true){
+      doneList.appendChild(label);
+
+      //localstorage - remove from to-do and insert in done 
+      todoTasks = todoTasks.filter(t => t.id !== task.id);
+      doneTasks.push(task);
+      methods.saveTasks(doneTasks, 'DONE-TASKS');
+    }
+    else{
+      list?.appendChild(label);
+
+      //localstorage - reverse process
+      doneTasks = doneTasks.filter(t => t.id !== task.id);
+      todoTasks.push(task);
+      methods.saveTasks(doneTasks, 'DONE-TASKS');
+    }
+
+    methods.saveTasks(todoTasks, 'TODO-TASKS')
   })
+
+
   checkbox.type = "checkbox"
   checkbox.checked = task.completed
-  label.append(checkbox, task.title)
+  let delationProcess= false;
+
+  deleteOneButton.setAttribute("type", "button");
+  deleteOneButton.setAttribute("id", "deleteButton");
+  deleteOneButton.appendChild(document.createTextNode(" -- "));
+  
+  deleteOneButton.addEventListener("click", () =>{
+    if (checkbox.checked) methods.deleteOne(item,task.id, doneTasks, 'DONE-TASKS');
+    else methods.deleteOne(item,task.id, todoTasks, 'TODO-TASKS');
+    delationProcess = true;
+  })
+
+  label.append(checkbox, task.title, deleteOneButton)
   item.append(label)
-  list?.append(item)
-}
 
-function saveTasks() {
-  localStorage.setItem("TODO-TASKS", JSON.stringify(todoTasks))
-}
+  // checked = done
+  if (checkbox.checked && !delationProcess) listDone?.append(item)
+  else if (!checkbox.checked && !delationProcess) list?.append(item)
+  
 
-function loadTasks(): Task[] {
-  const taskJSON = localStorage.getItem("TODO-TASKS")
-  if (taskJSON == null) return []
-  return JSON.parse(taskJSON)
 }
 
 
 
-function addToDone() {
-  localStorage.setItem("DONE-TASKS", JSON.stringify(todoTasks))
-}
+/* redundant code ahead */
+
+//TO-DO bind delete all and show input buttons to html
+let deleteAllBtnTodo = document.getElementById("left") as HTMLButtonElement;
+deleteAllBtnTodo.addEventListener("click", () =>{methods.deleteAll('TODO-TASKS')});
+
+let addOneTodo = document.getElementById("right") as HTMLButtonElement;
+addOneTodo.addEventListener("click", () =>{methods.showInput('new-task-form')});
+
+
+//DONE bind delete all and show input buttons to html
+let deleteAllBtnDone = document.getElementById("left-done") as HTMLButtonElement;
+deleteAllBtnDone.addEventListener("click", () =>{methods.deleteAll('DONE-TASKS')});
+
+let addOneDone = document.getElementById("right-done") as HTMLButtonElement;
+addOneDone.addEventListener("click", () =>{methods.showInput('done-task-form')});
+
