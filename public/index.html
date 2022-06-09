@@ -1,27 +1,136 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <link rel="icon" href="/favicon.ico" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="description" content="Web site created using create-snowpack-app" />
-    <link rel="stylesheet" type="text/css" href="/index.css" />
-    <title>Snowpack App</title>
-  </head>
-  <body>
-    <img id="img" src="/logo.svg" />
-    <canvas id="canvas"></canvas>
-    <noscript>You need to enable JavaScript to run this app.</noscript>
-    <script type="module" src="/dist/index.js"></script>
-    <!--
-      This HTML file is a template.
-      If you open it directly in the browser, you will see an empty page.
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="dist/index.js" type="module"></script>
+  <!--CDN-->
+  <!-- CSS only -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
+  <!-- JavaScript Bundle with Popper -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous"></script>
+  <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.no-icons.min.css" rel="stylesheet">
+  <link href="//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css" rel="stylesheet">
+  
+  <title>Document</title>
+  <style>
+    #list {
+      list-style: none;
+      padding: 0;
+    }
+    label {
+      overflow-wrap: break-word;
+    }
+    li {
+      margin-bottom: 8px;
+      /*background-color: #fcf003;
+      box-shadow: 1px 1px #888888;*/
+      
+    }
 
-      You can add webfonts, meta tags, or analytics to this file.
-      The build step will place the bundled scripts into the <body> tag.
+    #header{
+      width:100%;
+      text-align:center;
+      margin-top: 10px;
+      margin-left: 6%;
+    }
+    #left{
+      float:left;
+      width:50px;}
 
-      To begin the development, run `npm start` or `yarn start`.
-      To create a production bundle, use `npm run build` or `yarn build`.
-    -->
-  </body>
+    #right{
+      float:right;
+      width:40px;
+      margin-right:10px;
+    }
+
+    #center{ 
+      display: inline-block;
+      width:100px;
+      margin-left: 2%;  
+    }
+
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="row">
+      <div class="col" style="background-color: white;">
+        <h1 style="text-align: center;">My to-do list</h1>
+      </div>
+    </div>
+    <div class="row" style="min-height:650px; text-align: center; padding-top:10px; background-color:#f5f5f0; border-radius: 20px;border-style: solid; border-width: 1px 0 0 0;">
+      <div class="col-sm"></div>
+      <div class="col-sm">
+      <!--TODO html-->
+      
+      <div id="to-do-tasks" style="background-color: #fce303; width:fit-content; width: 100%; min-height: 300px; box-shadow: 2px 2px;">
+        <div id="header"style="display: inline-block;">
+          <div>
+            <a class="btn btn-danger" id="left" onClick="deleteAll()">
+              <i class="icon-trash icon-large"></i></a> 
+          </div>
+          
+          <div id="center"><h3 style="float: left;">TO-DO</h3>  </div>
+          <div id="right"><i onclick="myFunction()"  class="icon-plus icon-large" style="color:blue;"></i></div>
+        </div>
+        <ul id="list" style="text-align: left; padding-left: 2px; font-size:16px; padding-right:10px; width:175px;"></ul>
+      
+      <form id="new-task-form" style="display: none;">
+        <input type="text" id="new-task-title">
+        <button type="submit" class="btn btn-primary">Add</button>
+      </form>
+
+      </div>
+      </div>
+      <!--end-->
+
+      <div class="col-sm">
+
+         <!--DONE html-->
+         <div id="to-do-tasks" style="background-color: #fce303; width:fit-content; width: 100%; min-height: 300px; box-shadow: 2px 2px;">
+          <div id="header"style="display: inline-block;">
+            <div>
+              <a class="btn btn-danger" id="left" onClick="deleteAll()">
+                <i class="icon-trash icon-large"></i></a> 
+            </div>
+            
+            <div id="center"><h3 style="float: left;">DONE</h3>  </div>
+            <div id="right"><i onclick="myFunction()"  class="icon-plus icon-large" style="color:blue;"></i></div>
+          </div>
+          <ul id="list" style="text-align: left; padding-left: 2px; font-size:16px; padding-right:10px;"></ul>
+        
+        <form id="done-task-form" style="display: none;">
+          <input type="text" id="new-task-title">
+          <button type="submit" class="btn btn-primary">Add</button>
+        </form>
+  
+        </div>
+        </div>
+
+      <!--end-->
+      <div class="col-sm"></div>
+    </div>
+  </div>
+
+  
+</body>
+
+<script>
+  function myFunction() {
+    var x = document.getElementById("new-task-form");
+    if (x.style.display === "none") {
+      x.style.display = "block";
+    } else {
+      x.style.display = "none";
+    }
+  }
+
+  function deleteAll(){
+    localStorage.removeItem("TODO-TASKS") 
+    location.reload()
+  }
+</script>
 </html>
+
